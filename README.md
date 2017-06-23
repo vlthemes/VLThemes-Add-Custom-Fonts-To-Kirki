@@ -1,4 +1,4 @@
-###Add Typekit Fonts to WP Live Customizer
+# Add Typekit Fonts to WP Live Customizer
 
 1. Activate Typekit in Live Customizer
 2. Enter your Typekit Kit ID (ex. dhl1xhg)
