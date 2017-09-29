@@ -9,16 +9,21 @@ class themeAddTypekit {
     public $typekit_enable;
     public $typekit_fonts;
     public function __construct() {
-        $this->_typekit_id = ramsay_get_option( 'typekit_id' );
-        $this->typekit_enable = ramsay_get_option( 'enable_typekit' );
-        $this->typekit_fonts = ramsay_get_option( 'typekit_fonts' );
-        add_action( 'wp_head', array( $this, 'load_typekit' ), 0 );
+
+        $theme_info = wp_get_theme();
+        $this->theme_version = $theme_info[ 'Version' ];
+
+        $this->_typekit_id = paragon_get_option( 'typekit_id' );
+        $this->typekit_enable = paragon_get_option( 'enable_typekit' );
+        $this->typekit_fonts = paragon_get_option( 'typekit_fonts' );
+
+        if ( ! empty( $this->_typekit_id ) && $this->typekit_enable ){
+            add_action( 'wp_enqueue_scripts', array( $this, 'load_typekit' ) );
+        }
         add_filter( 'kirki/fonts/google_fonts', array( $this, 'add_typekit_fonts' ) );
     }
     public function load_typekit() {
-        if ( ! empty( $this->_typekit_id ) && $this->typekit_enable ){
-            echo '<script src="https://use.typekit.net/'.esc_attr( $this->sanitize_typekit_id( $this->_typekit_id ) ) .'.js"></script>';
-        }
+        wp_enqueue_style( 'vlt-typekit', 'https://use.typekit.net/'.esc_attr( $this->sanitize_typekit_id( $this->_typekit_id ) ) .'.css', array(), $this->theme_version );
     }
     public function sanitize_typekit_id( $id ) {
         return preg_replace( '/[^0-9a-z]+/', '', $id );
