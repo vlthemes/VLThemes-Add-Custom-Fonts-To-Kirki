@@ -28,7 +28,7 @@ Kirki::add_field( 'ramsay_customize', array(
     'default' => 'uex0khw',
     'priority' => $priority++,
     'transport' => 'auto',
-    'required' => array(
+    'active_callback' => array(
         array(
             'setting' => 'enable_typekit',
             'operator' => '==',
