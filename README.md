@@ -1,4 +1,4 @@
-# Add Custom Fonts to WP Live Customizer
+# Add Custom Fonts to Kirki
 
 1. Install Custom Font Plugin (https://wordpress.org/plugins/custom-fonts/)
 2. Setup your fonts
