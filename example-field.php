@@ -4,28 +4,23 @@
  * General Fonts
  */
 
-$priority = 0;
-
-$primary_font_variant = array(
-	'variant' => array( 'regular', 'italic', '700', '700italic' )
-);
-
-Kirki::add_field( 'norfolk_customize', array(
+VLT_Options::add_field( array(
 	'type' => 'typography',
 	'settings' => 'primary_font',
 	'section' => 'typography_fonts',
-	'label' => esc_html__( 'Primary Font', 'norfolk' ),
+	'label' => esc_html__( 'Primary Font', '@@textdomain' ),
 	'priority' => $priority++,
 	'transport' => 'auto',
-	'choices' => norfolk_add_custom_choice( $primary_font_variant ),
+	'choices' => leedo_add_custom_choice(), // add this function here
 	'default' => array(
-		'font-family' => 'Poppins'
+		'font-family' => 'Montserrat'
 	),
 	'output' => array(
 		array(
-			'element' => '
-				.vlt-primary-font
-			'
+			'choice' => 'font-family',
+			'element' => ':root',
+			'property' => '--pf',
+			'context' => array( 'editor', 'front' ),
 		)
 	)
 ) );
