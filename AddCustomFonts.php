@@ -14,6 +14,8 @@ if ( ! function_exists( 'leedo_add_custom_choice' ) ) {
 if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 	class VLThemesAddCustomFonts {
 
+		public $custom_fonts = array();
+
 		/**
 		 * The single class instance.
 		 * @var $_instance
@@ -40,39 +42,77 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 		 * Init hooks
 		 */
 		public function init_hooks() {
-			add_action( 'init', array( $this, 'get_fonts' ) );
-			add_filter( 'vlthemes/kirki_font_choices', array( $this, 'add_fonts' ) );
+			add_action( 'init', array( $this, 'get_custom_fonts' ) );
+			add_filter( 'vlthemes/kirki_font_choices', array( $this, 'add_custom_fonts' ) );
 		}
 
 		/**
-		 * Get fonts from Bsf_Custom_Fonts_Taxonomy
+		 * Get custom fonts from Bsf_Custom_Fonts_Taxonomy
 		 */
-		public function get_fonts() {
+		public function get_custom_fonts() {
 			if ( ! class_exists( 'Bsf_Custom_Fonts_Taxonomy' ) ) {
 				return;
 			}
 			update_option( 'vlt_custom_fonts', Bsf_Custom_Fonts_Taxonomy::get_fonts() );
 		}
 
-		/**
-		 * Add fonts to Kirki
-		 */
-		public function add_fonts( $custom_choice ) {
+		public function prepare_custom_fonts() {
 
 			$fonts = get_option( 'vlt_custom_fonts' );
-			$children = array();
-			$variants = array();
+			$new_fonts = array();
 
 			if ( ! empty( $fonts ) ) {
-
 				foreach ( $fonts as $font => $key ) {
-
-					$children[] = array(
+					$new_fonts[$font] = array(
 						'id' => $font,
 						'text' => $font
 					);
+				}
+			}
 
-					$variants[$font] = array( '200', '300', '400', '400italic', '500', '500italic', '600', '600italic', '700', '700italic', '800', '800italic', 'regular', 'italic' );
+			return $new_fonts;
+
+		}
+
+		public function prepare_typekit_fonts() {
+
+			$fonts = get_option( 'custom-typekit-fonts' );
+			$fonts = $fonts['custom-typekit-font-details'];
+			$new_fonts = array();
+
+			if ( ! empty( $fonts ) ) {
+				foreach ( $fonts as $font ) {
+					$new_fonts[json_encode( $font['css_names'] )] = array(
+						'id' => $font['css_names'],
+						'text' => $font['family']
+					);
+				}
+			}
+
+			return $new_fonts;
+
+		}
+
+		/**
+		 * Add custom fonts to Kirki
+		 */
+		public function add_custom_fonts( $custom_choice ) {
+
+			$custom_fonts = array_merge( $this->prepare_custom_fonts(), $this->prepare_typekit_fonts() );
+
+			$children = array();
+			$variants = array();
+
+			if ( ! empty( $custom_fonts ) ) {
+
+				foreach ( $custom_fonts as $custom_font ) {
+
+					$children[] = array(
+						'id' => $custom_font['id'],
+						'text' => $custom_font['text']
+					);
+
+					$variants[json_encode( $custom_font['id'] )] = array( '200', '300', '400', '400italic', '500', '500italic', '600', '600italic', '700', '700italic', '800', '800italic', 'regular', 'italic' );
 
 				}
 
