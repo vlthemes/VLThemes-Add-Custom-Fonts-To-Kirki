@@ -1,19 +1,16 @@
 <?php
 
 /**
- * Add custom choice
+ * @author: VLThemes
+ * @version: 1.0
  */
-if ( ! function_exists( 'leedo_add_custom_choice' ) ) {
-	function leedo_add_custom_choice() {
-		return array(
-			'fonts' => apply_filters( 'vlthemes/kirki_font_choices', array() )
-		);
-	}
-}
 
 if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 	class VLThemesAddCustomFonts {
 
+		/**
+		 * Custom fonts array
+		 */
 		public $custom_fonts = array();
 
 		/**
@@ -53,19 +50,23 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 			if ( ! class_exists( 'Bsf_Custom_Fonts_Taxonomy' ) ) {
 				return;
 			}
-			update_option( 'vlt_custom_fonts', Bsf_Custom_Fonts_Taxonomy::get_fonts() );
+			update_option( 'vlthemes-custom-fonts', Bsf_Custom_Fonts_Taxonomy::get_fonts() );
 		}
 
+		/**
+		 * Prepare custom fonts
+		 */
 		public function prepare_custom_fonts() {
 
-			$fonts = get_option( 'vlt_custom_fonts' );
 			$new_fonts = array();
+			$fonts = get_option( 'vlthemes-custom-fonts' );
 
 			if ( ! empty( $fonts ) ) {
 				foreach ( $fonts as $font => $key ) {
 					$new_fonts[$font] = array(
 						'id' => $font,
-						'text' => $font
+						'text' => $font,
+						'variant' => array( '200', '300', '400', '400italic', '500', '500italic', '600', '600italic', '700', '700italic', '800', '800italic', 'regular', 'italic' )
 					);
 				}
 			}
@@ -74,18 +75,24 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 
 		}
 
+		/**
+		 * Prepare Typekit fonts
+		 */
 		public function prepare_typekit_fonts() {
 
+			$new_fonts = array();
 			$fonts = get_option( 'custom-typekit-fonts' );
 			$fonts = $fonts['custom-typekit-font-details'];
-			$new_fonts = array();
 
 			if ( ! empty( $fonts ) ) {
-				foreach ( $fonts as $font ) {
-					$new_fonts[json_encode( $font['css_names'] )] = array(
-						'id' => $font['css_names'],
-						'text' => $font['family']
+				foreach ( $fonts as $key => $font ) {
+
+					$new_fonts[$key] = array(
+						'id' => json_encode( $font['css_names'] ),
+						'text' => json_encode( $font['family'] ),
+						'variant' => $font['weights']
 					);
+
 				}
 			}
 
@@ -112,14 +119,14 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 						'text' => $custom_font['text']
 					);
 
-					$variants[json_encode( $custom_font['id'] )] = array( '200', '300', '400', '400italic', '500', '500italic', '600', '600italic', '700', '700italic', '800', '800italic', 'regular', 'italic' );
+					$variants[$custom_font['id']] = $custom_font['variant'];
 
 				}
 
 			}
 
 			$custom_choice['families']['custom'] = array(
-				'text' => esc_attr__( 'Custom Fonts', '@@textdomain' ),
+				'text' => esc_attr__( 'Custom Fonts', 'vlthemes' ),
 				'children' => $children
 			);
 
