@@ -7,4 +7,4 @@ Extension for Kirki that adds custom fonts to the Typography field. It works wit
 3. Finally you can find your font in Kirki
 
 ## Credits
-Thanks to @@MapSteps for his method.
+Thanks to [MapSteps](https://github.com/MapSteps) for this method.
