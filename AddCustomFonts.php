@@ -9,9 +9,19 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 	class VLThemesAddCustomFonts {
 
 		/**
-		 * Custom fonts array
+		 * New fonts array
 		 */
-		public $custom_fonts = array();
+		public $new_fonts = array();
+
+		/**
+		 * Children array
+		 */
+		public static $children = array();
+
+		/**
+		 * Variants array
+		 */
+		public static $variants = array();
 
 		/**
 		 * The single class instance.
@@ -27,6 +37,8 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 			if ( is_null( self::$_instance ) ) {
 				self::$_instance = new self();
 				self::$_instance->init_hooks();
+				self::$_instance->prepare_custom_fonts();
+				self::$_instance->prepare_typekit_fonts();
 			}
 			return self::$_instance;
 		}
@@ -58,20 +70,17 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 		 */
 		public function prepare_custom_fonts() {
 
-			$new_fonts = array();
 			$fonts = get_option( 'vlthemes-custom-fonts' );
 
 			if ( ! empty( $fonts ) ) {
 				foreach ( $fonts as $font => $key ) {
-					$new_fonts[$font] = array(
+					$this->new_fonts[$font] = array(
 						'id' => $font,
 						'text' => $font,
 						'variant' => array( '200', '300', '400', '400italic', '500', '500italic', '600', '600italic', '700', '700italic', '800', '800italic', 'regular', 'italic' )
 					);
 				}
 			}
-
-			return $new_fonts;
 
 		}
 
@@ -80,14 +89,13 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 		 */
 		public function prepare_typekit_fonts() {
 
-			$new_fonts = array();
 			$fonts = get_option( 'custom-typekit-fonts' );
 			$fonts = $fonts['custom-typekit-font-details'];
 
 			if ( ! empty( $fonts ) ) {
 				foreach ( $fonts as $key => $font ) {
 
-					$new_fonts[$key] = array(
+					$this->new_fonts[$key] = array(
 						'id' => json_encode( $font['css_names'] ),
 						'text' => json_encode( $font['family'] ),
 						'variant' => $font['weights']
@@ -96,8 +104,6 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 				}
 			}
 
-			return $new_fonts;
-
 		}
 
 		/**
@@ -105,21 +111,16 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 		 */
 		public function add_custom_fonts( $custom_choice ) {
 
-			$custom_fonts = array_merge( $this->prepare_custom_fonts(), $this->prepare_typekit_fonts() );
+			if ( ! empty( $this->new_fonts ) ) {
 
-			$children = array();
-			$variants = array();
+				foreach ( $this->new_fonts as $new_font ) {
 
-			if ( ! empty( $custom_fonts ) ) {
-
-				foreach ( $custom_fonts as $custom_font ) {
-
-					$children[] = array(
-						'id' => $custom_font['id'],
-						'text' => $custom_font['text']
+					self::$children[] = array(
+						'id' => $new_font['id'],
+						'text' => $new_font['text']
 					);
 
-					$variants[$custom_font['id']] = $custom_font['variant'];
+					self::$variants[$new_font['id']] = $new_font['variant'];
 
 				}
 
@@ -127,12 +128,13 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 
 			$custom_choice['families']['custom'] = array(
 				'text' => esc_attr__( 'Custom Fonts', 'vlthemes' ),
-				'children' => $children
+				'children' => self::$children
 			);
 
-			$custom_choice['variants'] = $variants;
+			$custom_choice['variants'] = self::$variants;
 
 			return $custom_choice;
+
 		}
 
 	}
