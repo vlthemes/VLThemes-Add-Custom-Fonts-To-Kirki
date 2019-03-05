@@ -93,17 +93,48 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 			$fonts = $fonts['custom-typekit-font-details'];
 
 			if ( ! empty( $fonts ) ) {
+
 				foreach ( $fonts as $key => $font ) {
 
 					$this->new_fonts[$key] = array(
-						'id' => json_encode( $font['css_names'] ),
-						'text' => json_encode( $font['family'] ),
+						'id' => implode( $font['css_names'] ),
+						'text' => $font['family'],
 						'variant' => $font['weights']
 					);
 
 				}
+
 			}
 
+		}
+
+		/**
+		 * Check is font in array
+		 */
+		public function is_in_array( $array, $key, $key_value ) {
+			$within_array = 'no';
+
+			foreach ( $array as $k => $v ) {
+
+				if ( is_array( $v ) ) {
+					$within_array = $this->is_in_array( $v, $key, $key_value );
+
+					if ( $within_array == 'yes' ) {
+						break;
+					}
+
+				} else {
+
+					if ( $v == $key_value && $k == $key ) {
+						$within_array = 'yes';
+						break;
+					}
+
+				}
+
+			}
+
+			return $within_array;
 		}
 
 		/**
@@ -115,12 +146,16 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 
 				foreach ( $this->new_fonts as $new_font ) {
 
-					self::$children[] = array(
-						'id' => $new_font['id'],
-						'text' => $new_font['text']
-					);
+					if ( $this->is_in_array( self::$children, 'id', $new_font['id'] ) == 'no' ) {
 
-					self::$variants[$new_font['id']] = $new_font['variant'];
+						self::$children[] = array(
+							'id' => $new_font['id'],
+							'text' => $new_font['text']
+						);
+
+						self::$variants[$new_font['id']] = $new_font['variant'];
+
+					}
 
 				}
 
@@ -139,6 +174,10 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 
 	}
 
-	VLThemesAddCustomFonts::instance();
+	function vlthemes_add_custom_fonts() {
+		return VLThemesAddCustomFonts::instance();
+	}
+
+	vlthemes_add_custom_fonts();
 
 }
