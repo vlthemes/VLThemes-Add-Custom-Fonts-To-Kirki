@@ -6,5 +6,20 @@ Extension for Kirki that adds custom fonts to the Typography field. It works wit
 2. Setup your fonts
 3. Finally you can find your font in Kirki
 
+## Add Custom Choice
+```php
+/**
+ * Add custom choice
+ */
+if ( ! function_exists( 'leedo_add_custom_choice' ) ) {
+	function leedo_add_custom_choice() {
+		$test = apply_filters( 'vlthemes/kirki_font_choices', array() );
+		return array(
+			'fonts' => $test
+		);
+	}
+}
+```
+
 ## Credits
 Thanks to [MapSteps](https://github.com/MapSteps) for this method.
