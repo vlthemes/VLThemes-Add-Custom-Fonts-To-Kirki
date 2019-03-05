@@ -6,7 +6,7 @@ Extension for Kirki that adds custom fonts to the Typography field. It works wit
 2. Setup your fonts
 3. Finally you can find your font in Kirki
 
-## Add Custom Choice
+## Add Custom Choice Function
 ```php
 /**
  * Add custom choice
