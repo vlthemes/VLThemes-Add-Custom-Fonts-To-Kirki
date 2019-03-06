@@ -41,7 +41,7 @@ VLT_Options::add_field( array(
 ) );
 ```
 
-### Inlclude class to your theme
+### Include class to your theme
 ```php
 include_once( PATH . 'AddCustomFonts.php' );
 ```
