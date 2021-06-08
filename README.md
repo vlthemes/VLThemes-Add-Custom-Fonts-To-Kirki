@@ -8,37 +8,41 @@ Extension for Kirki that adds custom fonts to the Typography field. It works wit
 /**
  * Add custom choice
  */
-if ( ! function_exists( 'leedo_add_custom_choice' ) ) {
-	function leedo_add_custom_choice() {
-		return array(
-			'fonts' => apply_filters( 'vlthemes/kirki_font_choices', array() )
-		);
+public function kirki_fonts_choices( $settings = [] ) {
+
+	$fonts_list = apply_filters( 'vlthemes_fonts_list', [] );
+
+	if ( ! $fonts_list ) {
+		return $settings;
 	}
+
+	$fonts_settings = [
+		'fonts' => [
+			'google' => [],
+			'families' => isset( $fonts_list[ 'families' ] ) ? $fonts_list[ 'families' ] : null,
+			'variants' => isset( $fonts_list[ 'variants' ] ) ? $fonts_list[ 'variants' ] : null
+		]
+	];
+
+	$fonts_settings = array_merge( (array) $fonts_settings, (array) $settings );
+
+	return $fonts_settings;
 }
 ```
 
 ### Enter custom choice  function to your typography fields
 ```php
-VLT_Options::add_field( array(
-	'type' => 'typography',
-	'settings' => 'primary_font',
-	'section' => 'typography_fonts',
-	'label' => esc_html__( 'Primary Font', '@@textdomain' ),
-	'priority' => $priority++,
-	'transport' => 'auto',
-	'choices' => leedo_add_custom_choice(), // add this function here
-	'default' => array(
-		'font-family' => 'Montserrat'
-	),
-	'output' => array(
-		array(
-			'choice' => 'font-family',
-			'element' => ':root',
-			'property' => '--pf',
-			'context' => array( 'editor', 'front' ),
-		)
-	)
-) );
+'choices' => apply_filters(
+	'vlthemes_fonts_choices', [
+		'variant' => [
+			'300',
+			'regular',
+			'500',
+			'600',
+			'700',
+		]
+	]
+),
 ```
 
 ### Include class to your theme
