@@ -5,9 +5,11 @@ Extension for Kirki that adds custom fonts to the Typography field. It works wit
 
 ### Add this function to your theme
 ```php
+add_filter( 'vlthemes_fonts_choices', [ $this, 'kirki_fonts_choices' ] );
+
 /**
- * Add custom choice
- */
+* Add support wp-custom-fonts in Kirki
+*/
 public function kirki_fonts_choices( $settings = [] ) {
 
 	$fonts_list = apply_filters( 'vlthemes_fonts_list', [] );
