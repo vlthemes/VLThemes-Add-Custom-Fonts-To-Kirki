@@ -9,21 +9,6 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 	class VLThemesAddCustomFonts {
 
 		/**
-		 * New fonts array
-		 */
-		public $new_fonts = array();
-
-		/**
-		 * Children array
-		 */
-		public static $children = array();
-
-		/**
-		 * Variants array
-		 */
-		public static $variants = array();
-
-		/**
 		 * The single class instance.
 		 * @var $_instance
 		 */
@@ -37,8 +22,6 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 			if ( is_null( self::$_instance ) ) {
 				self::$_instance = new self();
 				self::$_instance->init_hooks();
-				self::$_instance->prepare_custom_fonts();
-				self::$_instance->prepare_typekit_fonts();
 			}
 			return self::$_instance;
 		}
@@ -51,133 +34,90 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 		 * Init hooks
 		 */
 		public function init_hooks() {
-			add_action( 'init', array( $this, 'get_custom_fonts' ) );
-			add_filter( 'vlthemes/kirki_font_choices', array( $this, 'add_custom_fonts' ) );
+			add_action( 'init', [ $this, 'prepare_custom_fonts' ] );
+			add_filter( 'vlthemes_fonts_list', [ $this, 'custom_fonts' ], 20 );
+			add_filter( 'vlthemes_fonts_list', [ $this, 'typekit_fonts' ], 20 );
 		}
 
 		/**
-		 * Get custom fonts from Bsf_Custom_Fonts_Taxonomy
-		 */
-		public function get_custom_fonts() {
-			if ( ! class_exists( 'Bsf_Custom_Fonts_Taxonomy' ) ) {
-				return;
-			}
-			update_option( 'vlthemes-custom-fonts', Bsf_Custom_Fonts_Taxonomy::get_fonts() );
-		}
-
-		/**
-		 * Prepare custom fonts
+		 * Prepare Custom fonts
 		 */
 		public function prepare_custom_fonts() {
 
-			$fonts = get_option( 'vlthemes-custom-fonts' );
+			if ( class_exists( 'Bsf_Custom_Fonts_Taxonomy' ) ) {
+				update_option( 'vlthemes-custom-fonts', Bsf_Custom_Fonts_Taxonomy::get_fonts() );
+			}
 
-			if ( ! empty( $fonts ) ) {
-				foreach ( $fonts as $font => $key ) {
-					$this->new_fonts[$font] = array(
+			return;
+
+		}
+
+		/**
+		 * Custom fonts
+		 */
+		public function custom_fonts( $fonts ) {
+
+			$custom_fonts = get_option( 'vlthemes-custom-fonts' );
+
+			if ( ! empty( $custom_fonts ) ) {
+
+				$fonts[ 'families' ][ 'custom_fonts' ] = array(
+					'text' => esc_html__( 'Custom Fonts', 'vlthemes' ),
+					'children' => []
+				);
+
+				foreach( $custom_fonts as $font => $key ) {
+
+					$fonts[ 'families' ][ 'custom_fonts' ][ 'children' ][] = [
 						'id' => $font,
-						'text' => $font,
-						'variant' => array( '200', '300', '400', '400italic', '500', '500italic', '600', '600italic', '700', '700italic', '800', '800italic', 'regular', 'italic' )
-					);
+						'text' => $font
+					];
+
+					$fonts[ 'variants' ][ $font ] = [ '100', '200', '300', '400', '500', '600', '700', '800', '900' ];
+
 				}
+
 			}
+
+			return $fonts;
 
 		}
 
 		/**
-		 * Prepare Typekit fonts
+		 * Typekit fonts
 		 */
-		public function prepare_typekit_fonts() {
+		public function typekit_fonts( $fonts ) {
 
-			$fonts = get_option( 'custom-typekit-fonts' );
-			$fonts = $fonts['custom-typekit-font-details'];
+			$typekit_fonts = get_option( 'custom-typekit-fonts' )[ 'custom-typekit-font-details' ];
 
-			if ( ! empty( $fonts ) ) {
+			if ( ! empty( $typekit_fonts ) ) {
 
-				foreach ( $fonts as $key => $font ) {
+				$fonts[ 'families' ][ 'typekit_fonts' ] = array(
+					'text' => esc_html__( 'TypeKit Fonts', 'vlthemes' ),
+					'children' => []
+				);
 
-					$this->new_fonts[$key] = array(
-						'id' => implode( $font['css_names'] ),
-						'text' => $font['family'],
-						'variant' => $font['weights']
-					);
+				foreach( $typekit_fonts as $font ) {
+
+					$id = $font[ 'slug' ];
+
+					$fonts[ 'families' ][ 'typekit_fonts' ][ 'children' ][] = [
+						'id' => $font[ 'slug' ],
+						'text' => $font[ 'family' ]
+					];
+
+					$fonts[ 'variants' ][ $id ] = $font[ 'weights' ];
 
 				}
 
 			}
 
-		}
-
-		/**
-		 * Check is font in array
-		 */
-		public function is_in_array( $array, $key, $key_value ) {
-			$within_array = 'no';
-
-			foreach ( $array as $k => $v ) {
-
-				if ( is_array( $v ) ) {
-					$within_array = $this->is_in_array( $v, $key, $key_value );
-
-					if ( $within_array == 'yes' ) {
-						break;
-					}
-
-				} else {
-
-					if ( $v == $key_value && $k == $key ) {
-						$within_array = 'yes';
-						break;
-					}
-
-				}
-
-			}
-
-			return $within_array;
-		}
-
-		/**
-		 * Add custom fonts to Kirki
-		 */
-		public function add_custom_fonts( $custom_choice ) {
-
-			if ( ! empty( $this->new_fonts ) ) {
-
-				foreach ( $this->new_fonts as $new_font ) {
-
-					if ( $this->is_in_array( self::$children, 'id', $new_font['id'] ) == 'no' ) {
-
-						self::$children[] = array(
-							'id' => $new_font['id'],
-							'text' => $new_font['text']
-						);
-
-						self::$variants[$new_font['id']] = $new_font['variant'];
-
-					}
-
-				}
-
-			}
-
-			$custom_choice['families']['custom'] = array(
-				'text' => esc_attr__( 'Custom Fonts', 'vlthemes' ),
-				'children' => self::$children
-			);
-
-			$custom_choice['variants'] = self::$variants;
-
-			return $custom_choice;
+			return $fonts;
 
 		}
 
 	}
 
-	function vlthemes_add_custom_fonts() {
-		return VLThemesAddCustomFonts::instance();
-	}
-
-	vlthemes_add_custom_fonts();
+	return VLThemesAddCustomFonts::instance();
 
 }
