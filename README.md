@@ -49,7 +49,7 @@ public function kirki_fonts_choices( $settings = [] ) {
 
 ### Include class to your theme
 ```php
-include_once( PATH . 'AddCustomFonts.php' );
+include_once( PATH . 'custom-fonts.php' );
 ```
 
 ### Install and setup plugins
