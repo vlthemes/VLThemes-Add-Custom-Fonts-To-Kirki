@@ -1,26 +1,37 @@
 <?php
 
-/**
- * General Fonts
- */
-
 VLT_Options::add_field( array(
 	'type' => 'typography',
-	'settings' => 'primary_font',
-	'section' => 'typography_fonts',
-	'label' => esc_html__( 'Primary Font', '@@textdomain' ),
+	'settings' => 'text_typography',
+	'section' => 'typography_text',
+	'label' => '<span class="dashicons dashicons-desktop" style="margin-right: 5px;"></span>' . esc_html__( 'Desktop', '@@textdomain' ),
 	'priority' => $priority++,
-	'transport' => 'auto',
-	'choices' => leedo_add_custom_choice(), // add this function here
+	'choices' => apply_filters(
+		'vlthemes_fonts_choices', [
+			'variant' => [
+				'regular',
+				'500',
+				'600',
+				'700',
+			]
+		]
+	),
 	'default' => array(
-		'font-family' => 'Montserrat'
+		'font-family' => 'Inter',
+		'subsets' => [ 'latin' ],
+		'variant' => 'regular',
+		'font-size' => '1rem',
+		'line-height' => '1.625',
+		'letter-spacing' => '0',
+		'text-transform' => 'none'
 	),
 	'output' => array(
 		array(
-			'choice' => 'font-family',
-			'element' => ':root',
-			'property' => '--pf',
-			'context' => array( 'editor', 'front' ),
-		)
+			'element' => 'body'
+		),
+		array(
+			'element' => '.edit-post-visual-editor.editor-styles-wrapper',
+			'context' => array( 'editor' ),
+		),
 	)
 ) );
