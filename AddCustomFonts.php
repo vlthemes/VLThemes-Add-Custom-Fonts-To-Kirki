@@ -44,8 +44,18 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 		 */
 		public function prepare_custom_fonts() {
 
-			if ( class_exists( 'Bsf_Custom_Fonts_Taxonomy' ) ) {
-				update_option( 'vlthemes-custom-fonts', Bsf_Custom_Fonts_Taxonomy::get_fonts() );
+			if ( class_exists( 'Bsf_Custom_Fonts_Render' ) ) {
+
+				$fonts = Bsf_Custom_Fonts_Render::get_existing_font_posts();
+				$custom_fonts = array();
+
+				if ( ! empty( $fonts ) ) {
+					foreach ( $fonts as $key => $post_id ) {
+						$font_family_name = get_the_title( $post_id );
+						$custom_fonts[ $font_family_name ] = $font_family_name;
+					}
+				}
+				update_option( 'vlthemes-custom-fonts', $custom_fonts );
 			}
 
 			return;
