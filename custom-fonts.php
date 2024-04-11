@@ -46,7 +46,7 @@ if ( ! class_exists( 'VLThemesAddCustomFonts' ) ) {
 
 			if ( class_exists( 'Bsf_Custom_Fonts_Render' ) ) {
 
-				$fonts = Bsf_Custom_Fonts_Render::get_existing_font_posts();
+				$fonts = Bsf_Custom_Fonts_Render::get_instance()->get_existing_font_posts();
 				$custom_fonts = array();
 
 				if ( ! empty( $fonts ) ) {
